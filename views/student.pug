@@ -1,0 +1,32 @@
+extends default
+
+block content
+    script.
+        let percentages_data = !{JSON.stringify(percentages_data)};
+        let grades_data = !{JSON.stringify(grades_data)};
+        let students_courses = !{JSON.stringify(students_courses)};
+        let weekly_activities = !{JSON.stringify(weekly_activities)};
+        let indicators = !{JSON.stringify(indicators)};
+        let student = !{JSON.stringify(student)};
+        let timeline_info = !{JSON.stringify(timeline_info)};
+        let proposed_act = !{JSON.stringify(proposed_act)};
+
+        
+        function drawALL() {
+            draw_S_activities_in_timeline();
+            drawTimelineDisplay();
+            draw_S_Percentages();
+            draw_S_GradesTable();
+        }
+    div(class="content")
+        p Student: #{student.name}
+        div(class="grid-container")
+            div(id="act_plot")
+            div(id="timeline_plot")
+            div(id="percentages_plot" style={'grid-row-start': 1, 'grid-column-start': 2})
+            div(id="grades_plot" style={'grid-row-start': 2, 'grid-column-start': 1})
+
+    script(type="text/javascript" src="https://www.gstatic.com/charts/loader.js")
+    script(type="text/javascript" src="javascript/chartsGoogle.js")
+        
+

@@ -1,0 +1,30 @@
+.grid-container {
+  display: flex;
+  flex-wrap: wrap;
+    flex-grow: 1;
+    justify-content: center
+  }
+html, body, main {
+    height: 100vh;
+    padding: 0;
+    margin: 0;
+}
+main {
+  padding: auto;
+  display: flex;
+  flex-direction: column;
+}
+.content{
+  margin-left: 5%;
+  margin-right: 5%;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+.googleHeaderCell {
+  text-align: center;
+  background-color: beige;
+}
+button {
+  float: right;
+}

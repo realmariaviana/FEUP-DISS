@@ -1,0 +1,33 @@
+extends default
+
+block content
+    script.
+        let course = !{JSON.stringify(course)};
+        let participation_info = !{JSON.stringify(participation_info)};
+        let timeline_info = !{JSON.stringify(timeline_info)};
+        let grades_info = !{JSON.stringify(grades_info)};
+        let week_info = !{JSON.stringify(week_info)};
+        let box_plot_info = !{JSON.stringify(box_plot_info)};
+
+        function drawALL() {
+            
+            draw_C_activities_dist();
+            draw_C_weekly_percentage();
+            draw_C_participation_on_course();
+            draw_C_timeline_on_course();
+            draw_C_evaluations();
+        }
+    
+    div(class="content")
+        p Course: #{course.name}
+        div(class="grid-container")
+            div(id="timeline_on_course_plot")
+            div(id="weekly_plot")
+            div(id="participation_on_course_plot")
+            div(id="type_plot")
+            div(id="evaluations_plot")
+ 
+    script(type="text/javascript" src="https://www.gstatic.com/charts/loader.js")
+    script(type="text/javascript" src="javascript/chartsGoogle.js")
+        
+
