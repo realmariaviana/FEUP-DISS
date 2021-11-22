@@ -69,13 +69,13 @@ function draw_C_timeline_on_course() {
 
     let aux = [];
     timeline_info.forEach(element => {
-        let tooltip = '<p>' + element.done + ' of ' + course.num_students + ' have done this activity<br>' +
+        let tooltip = '<p>' + element.done + ' of ' + course.num_students + ' students have done this activity<br>' +
             new Date(element.time_open * 1000).toDateString() + ' to ' + new Date(element.time_close * 1000).toDateString() + '<br>Week ' +
             element.week_start + ' to ' + element.week_end + '</p>';
         aux.push(
             [
                 'n',
-                element.done + ' of ' + course.num_students,
+                element.done + ' of ' + course.num_students, 
                 tooltip,
                 new Date(element.time_open * 1000),
                 new Date(element.time_close * 1000)
@@ -85,11 +85,14 @@ function draw_C_timeline_on_course() {
     // Add data.
     data.addRows(aux);
     var options = {
-        title: '',
-        timeline: { showRowLabels: false },
+        title: "Timeline of Activities",
+        // timeline: { showRowLabels: false },
         allowHtml: true,
         height: height,
-        width: width
+        width: width,
+        hAxis: {
+            title: 'Week of the semester'
+        }
     };
 
     let chart = new google.visualization.Timeline(document.getElementById('timeline_on_course_plot'));
@@ -254,8 +257,8 @@ function draw_S_activities_in_timeline() {
     data.addColumn('string', 'Bar');
     data.addColumn({ type: 'string', role: 'tooltip' });
 
-    data.addColumn('datetime', 'Start');
-    data.addColumn('datetime', 'End');
+    data.addColumn('number', 'Start');
+    data.addColumn('number', 'End');
 
     let aux = [];
     proposed_act.forEach(element => {
@@ -265,8 +268,8 @@ function draw_S_activities_in_timeline() {
                 element.course + '',
                 element.done != null ? (element.done > element.time_close ? "Late" : "Done") : "Missing",
                 tooltip,
-                new Date(element.time_open * 1000),
-                new Date(element.time_close * 1000)
+                element.week_start,
+                element.week_end
             ]
         );
     });
@@ -352,7 +355,7 @@ function draw_S_GradesTable() {
         var selectedItem = table.getSelection()[0];
         if (selectedItem) {
             var value = data.getValue(selectedItem.row, 0);
-            window.location.href = "/course?id=" + value;
+            window.location.href = "/course?code=" + value;
         }
     }
     table.draw(data, options);
@@ -709,6 +712,7 @@ function draw_P_Grades() {
 
 }
 function draw_P_aggregated() {
+
     let data = new google.visualization.DataTable();
 
     // Declare columns
@@ -731,8 +735,8 @@ function draw_P_aggregated() {
     data.addColumn({ type: 'string', role: 'tooltip' })
     let data_p = [];
     aggregate_Grades.forEach(element => {
-        let aux = [element.course + "", 100, element.min, element.Q1, element.median, element.Q3, element.max,
-        "Grades in course " + element.course + ":\n\tMax: " + element.max + "\n\tQ3: " + element.Q3 + "\n\tMedian: " + element.median + "\n\tQ1: " + element.Q1 + "\n\tMin: " + element.min];
+        let aux = [element.code + "", 100, element.min, element.Q1, element.median, element.Q3, element.max,
+        "Grades in " + element.code + ":\n\tMax: " + element.max + "\n\tQ3: " + element.Q3 + "\n\tMedian: " + element.median + "\n\tQ1: " + element.Q1 + "\n\tMin: " + element.min];
         let index = aggregate_Acts.findIndex((e) => e.course == element.course);
         let v = aggregate_Acts[index];
         if (v == null) {
@@ -744,7 +748,7 @@ function draw_P_aggregated() {
             v.max = null;
         }
         aux = aux.concat([100, v.min, v.Q1, v.median, v.Q3, v.max,
-            "Participation in course " + element.course + ":\n\tMax: " + v.max + "\n\tQ3: " + v.Q3 + "\n\tMedian: " + v.median + "\n\tQ1: " + v.Q1 + "\n\tMin: " + v.min
+            "Participation in " + element.code + ":\n\tMax: " + v.max + "\n\tQ3: " + v.Q3 + "\n\tMedian: " + v.median + "\n\tQ1: " + v.Q1 + "\n\tMin: " + v.min
         ]);
         data_p.push(aux);
     });
@@ -754,6 +758,9 @@ function draw_P_aggregated() {
         title: "Distribution of the students' grades and participation in each course",
         vAxis: {
             title: 'Percentage'
+        },
+        hAxis: {
+            title: 'Course',
         },
         height: height,
         width: width,
@@ -785,7 +792,7 @@ function draw_P_aggregated() {
     d3.selectAll('#agg_plot > div > div:nth-child(1) > div > svg > g:nth-child(5) > g:nth-child(4) > g text[text-anchor="middle"]').on('click', clickHandler).style('cursor', 'pointer');
 
     function clickHandler() {
-        window.location.href = "/course?id=" + this.innerHTML;
+        window.location.href = "/course?code=" + this.innerHTML;
     }
 
 }
@@ -882,7 +889,7 @@ function draw_weekly_percentage() {
     let columns = [];
     weekly_percentage[0].courses.forEach(element => {
         if (element != null) {
-            data.addColumn('number', element.course);
+            data.addColumn('number', element.code);
             columns.push(element.course);
         }
     });

@@ -12,9 +12,7 @@ const params_base = [
 var userid;
 const STUDENT_ROLE_ID = 5;
 function load_database() {
-    console.log("TESTE2");
     delete_all_records_from_db();
-    console.log("TESTE3");
     let params = new URLSearchParams(params_base);
     params.set('wsfunction', 'core_webservice_get_site_info');
     url.search = params;
@@ -36,10 +34,6 @@ function fetch_courses(userid) {
         .then(data => {
             params.delete('userid');
             let courses = parse_list_of_courses(data);
-            // console.log("-------- USER ID: " + userid);
-            // console.log("----------------COURSES----------------")
-            // console.log(courses);
-            // console.log("----------------COURSES----------------")
             load_courses_to_db(courses);
             fetch_students(courses);
         });
@@ -56,9 +50,6 @@ function fetch_students(courses) {
             .then(response => response.json())
             .then(data => {
                 let students = parse_list_of_students(data);
-                console.log("----------------STUDENTS----------------")
-            console.log(students);
-            console.log("----------------STUDENTS----------------")
                 load_students_to_db(students, element);
                 students_all = students_all.concat(students);
             }));

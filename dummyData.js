@@ -41,15 +41,15 @@ function createDummyData() {
     let good_students = shuffled.slice(number_of_not_participating + number_of_bad_students);
 
     let courses = [
-        { id: 22116, code: 22116, name: "Programação Web" },
-        { id: 22119, code: 22119, name: "Pesquisa e Recuperação de Informação" },
-        { id: 22120, code: 22120, name: "Realidade Virtual Distribuída" },
-        { id: 22121, code: 22121, name: "Sistemas Multiagente" },
-        { id: 22122, code: 22122, name: "Interação Humano-Computador" },
-        { id: 22124, code: 22124, name: "Extração do Conhecimento de Dados" },
-        { id: 22126, code: 22126, name: "Visualização de Informação" },
-        { id: 22129, code: 22129, name: "Elaboração da Dissertação" },
-        { id: 22130, code: 22130, name: "Heurísticas Modernas" }
+        { id: 22116, code: "PWEB", name: "Programação Web" },
+        { id: 22119, code: "PRI", name: "Pesquisa e Recuperação de Informação" },
+        { id: 22120, code: "RVI", name: "Realidade Virtual Distribuída" },
+        { id: 22121, code: "SMA", name: "Sistemas Multiagente" },
+        { id: 22122, code: "IPCO", name: "Interação Humano-Computador" },
+        { id: 22124, code: "ECD", name: "Extração do Conhecimento de Dados" },
+        { id: 22126, code: "VI", name: "Visualização de Informação" },
+        { id: 22129, code: "DISS", name: "Elaboração da Dissertação" },
+        { id: 22130, code: "HEUM", name: "Heurísticas Modernas" }
     ];
 
     const shuffled2 = students.sort(() => 0.5 - Math.random());

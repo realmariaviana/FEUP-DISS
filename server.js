@@ -68,12 +68,20 @@ app.get('/student', (req, res) => {
   });
 });
 
-app.get('/course', (req, res) => {
+app.get('/course', async(req, res) => {
   let promises = [];
-  if (req.query.id == null) {
+  let course_id = 0;
+  if (req.query.code != null) {
+    rows = await queries.get_course_id(req.query.code);
+    course_id = Number(rows[0].id);
+    
+  }
+  else if (req.query.id != null){
+    course_id = Number(req.query.id);
+  }
+  else{
     res.status(404).render('course404', { title: TITLE });
   }
-  let course_id = Number(req.query.id);
   promises.push(queries.get_course_info(course_id));
   promises.push(queries.get_participation_on_course(course_id));
   promises.push(queries.get_timeline_info_on_course(course_id));
@@ -84,7 +92,6 @@ app.get('/course', (req, res) => {
     if (values[0] == undefined) {
       res.status(404).render('course404', { title: TITLE });
     }
-    console.log(values)
     res.render('course', {
       title: TITLE,
       course: values[0],
