@@ -45,10 +45,10 @@ function createDummyData() {
         { id: 22119, code: "PRI", name: "Pesquisa e Recuperação de Informação" },
         { id: 22120, code: "RVI", name: "Realidade Virtual Distribuída" },
         { id: 22121, code: "SMA", name: "Sistemas Multiagente" },
-        { id: 22122, code: "IPCO", name: "Interação Humano-Computador" },
+        { id: 22122, code: "IHC", name: "Interação Humano-Computador" },
         { id: 22124, code: "ECD", name: "Extração do Conhecimento de Dados" },
         { id: 22126, code: "VI", name: "Visualização de Informação" },
-        { id: 22129, code: "DISS", name: "Elaboração da Dissertação" },
+        { id: 22129, code: "DISS", name: "Dissertação" },
         { id: 22130, code: "HEUM", name: "Heurísticas Modernas" }
     ];
 
@@ -177,12 +177,12 @@ function createDummyData() {
                     [].concat.apply([], courses.map((x) => [x['id'], x['name'], x['code']])))
                 .run('INSERT INTO Student_in_Course (student, course, lastaccess) VALUES ' + students_in_courses.map((x) => '(?,?,?)').join(',') + ';',
                     [].concat.apply([], students_in_courses.map((x) => [x['student'], x['course'], x['lastaccess']])))
-                .run('INSERT INTO Forum (id, course, time_close, time_open) VALUES ' + types_of_activities.forums.map((x) => '(?,?,?,?)').join(',') + ';',
-                    [].concat.apply([], types_of_activities.forums.map((x) => [x['id'], x['course'], x['duedate'],x.time_open])))
-                .run('INSERT INTO Assign (id, course, time_open, time_close) VALUES ' + types_of_activities.assigns.map((x) => '(?,?,?,?)').join(',') + ';',
-                    [].concat.apply([], types_of_activities.assigns.map((x) => [x['id'], x['course'], x['time_open'], x['time_close']])))
-                .run('INSERT INTO Quiz (id, course, attempts_permitted,time_open,time_close) VALUES ' + types_of_activities.quizzes.map((x) => '(?,?,?,?,?)').join(',') + ';',
-                    [].concat.apply([], types_of_activities.quizzes.map((x) => [x['id'], x['course'], x['attempts'], x['time_open'], x['time_close']])))
+                .run('INSERT INTO Forum (id, name, course, time_close, time_open) VALUES ' + types_of_activities.forums.map((x) => '(?,?,?,?,?)').join(',') + ';',
+                    [].concat.apply([], types_of_activities.forums.map((x) => [x['id'], x['name'], x['course'], x['duedate'],x.time_open])))
+                .run('INSERT INTO Assign (id, name, course, time_open, time_close) VALUES ' + types_of_activities.assigns.map((x) => '(?,?,?,?,?)').join(',') + ';',
+                    [].concat.apply([], types_of_activities.assigns.map((x) => [x['id'], x['name'], x['course'], x['time_open'], x['time_close']])))
+                .run('INSERT INTO Quiz (id, name, course, attempts_permitted,time_open,time_close) VALUES ' + types_of_activities.quizzes.map((x) => '(?,?,?,?,?,?)').join(',') + ';',
+                    [].concat.apply([], types_of_activities.quizzes.map((x) => [x['id'], x['name'], x['course'], x['attempts'], x['time_open'], x['time_close']])))
                 .run('INSERT INTO Post (student, forum, created, type) VALUES ' + activities.posts.map((x) => '(?,?,?,?)').join(',') + ';',
                     [].concat.apply([], activities.posts.map((x) => [x['student'], x['forum'], x['datecreated'], x['type']])))
                 .run('INSERT INTO Submission (student, assign, created) VALUES ' + activities.submissions.map((x) => '(?,?,?)').join(',') + ';',
@@ -262,12 +262,18 @@ function student_in_course(student, course, students_in_courses) {
     return false;
 }
 function SeparedteTopics(topics,types_of_activities) {
+    
+    let quizz_counter = 1;
+    let forum_counter = 1;
+    let assign_counter = 1;
+
     for (let index = 0; index < topics.length; index++) {
         const element = topics[index];
         switch (element.type) {
             case 1:
                 types_of_activities.forums.push({
                     id: element.id,
+                    name: 'Forum ' + forum_counter++,
                     course: element.course,
                     time_open: Math.floor(Math.floor(beginDate.getTime() + element.start * 1000 * 60 * 60 * 24) / 1000),
                     duedate: Math.floor(Math.floor(beginDate.getTime() + element.end * 1000 * 60 * 60 * 24) / 1000)
@@ -277,6 +283,7 @@ function SeparedteTopics(topics,types_of_activities) {
                 let t = Math.floor(Math.random() * 1.05);
                 types_of_activities.quizzes.push({
                     id: element.id,
+                    name: 'Quizz ' + quizz_counter++,
                     course: element.course,
                     attempts: t == 0 ? null : t,
                     time_open: Math.floor(Math.floor(beginDate.getTime() + element.start * 1000 * 60 * 60 * 24) / 1000),
@@ -286,6 +293,7 @@ function SeparedteTopics(topics,types_of_activities) {
             case 4:
                 types_of_activities.assigns.push({
                     id: element.id,
+                    name: 'Assignment ' + assign_counter++,
                     course: element.course,
                     time_open: Math.floor(Math.floor(beginDate.getTime() + element.start * 1000 * 60 * 60 * 24) / 1000),
                     time_close: Math.floor(Math.floor(beginDate.getTime() + element.end * 1000 * 60 * 60 * 24) / 1000)

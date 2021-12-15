@@ -21,11 +21,13 @@ block content
     div(class="content")
         p Course: #{course.name}
         div(class="grid-container")
-            div(id="timeline_on_course_plot")
             div(id="weekly_plot")
             div(id="participation_on_course_plot")
             div(id="type_plot")
             div(id="evaluations_plot")
+            <p><h5> Course timeline
+            <p>
+            div(id="timeline_on_course_plot")
  
     script(type="text/javascript" src="https://www.gstatic.com/charts/loader.js")
     script(type="text/javascript" src="javascript/chartsGoogle.js")

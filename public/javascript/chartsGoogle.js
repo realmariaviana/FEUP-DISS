@@ -2,7 +2,7 @@ const height = 275;
 const width = 550;
 
 // Load the Visualization API and the corechart package.
-google.charts.load('current', { 'packages': ['corechart', 'table', 'timeline'] });
+google.charts.load('current', { 'packages': ['corechart', 'table', 'timeline', 'gantt'] });
 
 // Set a callback to run when the Google Visualization API is loaded.
 google.charts.setOnLoadCallback(drawALL);
@@ -56,48 +56,69 @@ function draw_C_participation_on_course() {
     google.visualization.events.addListener(chart, 'onmouseout', changecursorDEFAULT);
 
     chart.draw(data, options);
+    
 }
-function draw_C_timeline_on_course() {
-    let data = new google.visualization.DataTable();
 
-    data.addColumn('string', 'Row');
-    data.addColumn('string', 'Bar');
-    data.addColumn({ type: 'string', role: 'tooltip' });
+ function draw_C_timeline_on_course() {
 
-    data.addColumn('datetime', 'Start');
-    data.addColumn('datetime', 'End');
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'Task ID');
+      data.addColumn('string', 'Task Name');
+      data.addColumn('string', 'Resource');
+      data.addColumn('date', 'Start Date');
+      data.addColumn('date', 'End Date');
+      data.addColumn('number', 'Duration in days');
+      data.addColumn('number', 'Percent Complete');
+      data.addColumn('string', 'Dependencies');
 
     let aux = [];
     timeline_info.forEach(element => {
-        let tooltip = '<p>' + element.done + ' of ' + course.num_students + ' students have done this activity<br>' +
-            new Date(element.time_open * 1000).toDateString() + ' to ' + new Date(element.time_close * 1000).toDateString() + '<br>Week ' +
-            element.week_start + ' to ' + element.week_end + '</p>';
+
+        let year_open = new Date(Number(element.time_open)*1000).getFullYear();
+        let month_open = new Date(Number(element.time_open)*1000).getMonth();
+        let day_open = new Date(Number(element.time_open)*1000).getDay();
+        let year_close = new Date(Number(element.time_close)*1000).getFullYear();
+        let month_close = new Date(Number(element.time_close)*1000).getMonth();
+        let day_close = new Date(Number(element.time_close)*1000).getDay();
+        let resource ="";
+        
+        if(element.name.startsWith("Quizz")){
+            resource = "quizz"
+        } 
+        else if(element.name.startsWith("Assignment")){
+            resource = "assignment"
+        }
+        else if(element.name.startsWith("Forum")){
+            resource ="forum"
+        }
+
         aux.push(
             [
-                'n',
-                element.done + ' of ' + course.num_students, 
-                tooltip,
-                new Date(element.time_open * 1000),
-                new Date(element.time_close * 1000)
+                String(element.id),
+                element.name,
+                resource,
+                new Date(year_open, month_open, day_open),
+                new Date(year_close, month_close, day_close),
+                null,
+                Math.round((element.done/course.num_students)*100), 
+                null
             ]
         );
-    });
-    // Add data.
+    });  
     data.addRows(aux);
-    var options = {
-        title: "Timeline of Activities",
-        // timeline: { showRowLabels: false },
-        allowHtml: true,
-        height: height,
-        width: width,
-        hAxis: {
-            title: 'Week of the semester'
+      
+      var options = {
+        title: "Timeline of the course",
+        height: height + 22*aux.length,
+        width: width + 200,
+        gantt: {
+          trackHeight: 30
         }
-    };
+      };
 
-    let chart = new google.visualization.Timeline(document.getElementById('timeline_on_course_plot'));
+      var chart = new google.visualization.Gantt(document.getElementById('timeline_on_course_plot'));
 
-    chart.draw(data, options);
+      chart.draw(data, options);
 }
 function draw_C_weekly_percentage() {
     let data_p = [];
@@ -257,26 +278,26 @@ function draw_S_activities_in_timeline() {
     data.addColumn('string', 'Bar');
     data.addColumn({ type: 'string', role: 'tooltip' });
 
-    data.addColumn('number', 'Start');
-    data.addColumn('number', 'End');
+    data.addColumn('datetime', 'Start');
+    data.addColumn('datetime', 'End');
 
     let aux = [];
     proposed_act.forEach(element => {
         let tooltip = (element.done != null ? ('<p> Done on ' + new Date(element.done * 1000).toDateString()) : "<p> Not Done")+ '<br>' + new Date(element.time_open * 1000).toDateString() + ' to ' + new Date(element.time_close * 1000).toDateString() + '<br>Week ' + element.week_start + ' to ' + element.week_end + '</p>';
         aux.push(
             [
-                element.course + '',
+                element.code + '',
                 element.done != null ? (element.done > element.time_close ? "Late" : "Done") : "Missing",
                 tooltip,
-                element.week_start,
-                element.week_end
+                new Date(element.time_open * 1000),
+                new Date(element.time_close * 1000)
             ]
         );
     });
     // Add data.
     data.addRows(aux);
     var options = {
-        title: '',
+        title: 'Activities timeline',
         timeline: { showRowLabels: true },
         allowHtml: true,
         height: height,
@@ -706,9 +727,9 @@ function draw_P_Grades() {
     d3.selectAll('#box_plot').selectAll('g[clip-path] > g:nth-child(2)').raise();
     d3.selectAll('#box_plot > div > div:nth-child(1) > div > svg > g:nth-child(4) > g:nth-child(4) text[text-anchor="middle"]').on('click', clickHandler).style('cursor', 'pointer');
 
-    function clickHandler() {
-        window.location.href = "/course?id=" + this.innerHTML;
-    }
+    // function clickHandler() {
+    //     window.location.href = "/course?id=" + this.innerHTML;
+    // }
 
 }
 function draw_P_aggregated() {
@@ -736,7 +757,7 @@ function draw_P_aggregated() {
     let data_p = [];
     aggregate_Grades.forEach(element => {
         let aux = [element.code + "", 100, element.min, element.Q1, element.median, element.Q3, element.max,
-        "Grades in " + element.code + ":\n\tMax: " + element.max + "\n\tQ3: " + element.Q3 + "\n\tMedian: " + element.median + "\n\tQ1: " + element.Q1 + "\n\tMin: " + element.min];
+        "Grades in " + element.name + ":\n\tMax: " + element.max + "\n\tQ3: " + element.Q3 + "\n\tMedian: " + element.median + "\n\tQ1: " + element.Q1 + "\n\tMin: " + element.min];
         let index = aggregate_Acts.findIndex((e) => e.course == element.course);
         let v = aggregate_Acts[index];
         if (v == null) {
@@ -748,7 +769,7 @@ function draw_P_aggregated() {
             v.max = null;
         }
         aux = aux.concat([100, v.min, v.Q1, v.median, v.Q3, v.max,
-            "Participation in " + element.code + ":\n\tMax: " + v.max + "\n\tQ3: " + v.Q3 + "\n\tMedian: " + v.median + "\n\tQ1: " + v.Q1 + "\n\tMin: " + v.min
+            "Participation in " + element.name + ":\n\tMax: " + v.max + "\n\tQ3: " + v.Q3 + "\n\tMedian: " + v.median + "\n\tQ1: " + v.Q1 + "\n\tMin: " + v.min
         ]);
         data_p.push(aux);
     });

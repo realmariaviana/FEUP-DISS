@@ -118,6 +118,6 @@ app.get('/dummy', (req, res) => {
 app.use(function (req, res, next) {
   res.status(404).render('404', { title: TITLE });
 });
-const server = app.listen(7001, () => {
+const server = app.listen(7000, () => {
   console.log(`Express running → PORT ${server.address().port}`);
 });
