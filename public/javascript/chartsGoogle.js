@@ -21,8 +21,9 @@ function draw_C_participation_on_course() {
 
     let aux = [];
     participation_info.forEach(element => {
-        aux.push([element[1], element[2]]);
+        aux.push([element[1], Math.round(element[2]*10)/10]);
     });
+    
     // Add data.
     data.addRows(aux);
     var options = {
@@ -143,10 +144,10 @@ function draw_C_weekly_percentage() {
             done_activities += element.courses[elem].done_activities;
             activities += element.courses[elem].activities;
             if (elem == course.id) {
-                data_point.push(100 * element.courses[elem].done_activities / element.courses[elem].activities);
+                data_point.push(Math.round((100 * element.courses[elem].done_activities / element.courses[elem].activities)*10)/10);
             }
         });
-        data_point.push(100 * done_activities / activities);
+        data_point.push(Math.round((100 * done_activities / activities)*10)/10);
         data_p.push(data_point);
     });
     // Add data.
@@ -240,6 +241,7 @@ function draw_C_activities_dist() {
     data.addColumn({ id: 'thirdQuartile', type: 'number', role: 'interval' });
     data.addColumn({ id: 'max', type: 'number', role: 'interval' });
     data.addRows(box_plot_info.data);
+    console.log(box_plot_info.data)
     let options = {
         title: "Distribution of participation in each activity type",
         vAxis: {
@@ -562,8 +564,10 @@ function draw_P_LastDays() {
     data.addColumn('number', 'Percentage of open activities done');
 
     last_access.forEach(element => {
+        let average = Math.round(element.avg * 10) / 10;
+        let percentage = Math.round(element.per * 10) / 10;
         let name = histogram_data[histogram_data.findIndex((x) => { return x[2] == element.id })][0];
-        data_p.push([element.id, name, element.days, element.avg, element.per]);
+        data_p.push([element.id, name, element.days, average, percentage]);
     });
 
     data.addRows(data_p);
@@ -579,9 +583,9 @@ function draw_P_LastDays() {
     }
 
     let formatter = new google.visualization.ColorFormat();
-    formatter.addGradientRange(0, 7, 'black', 'green', 'yellow');
-    formatter.addGradientRange(7, 15, 'black', 'yellow', 'red');
-    formatter.addRange(null, null, 'black', 'red');
+    formatter.addGradientRange(0, 7, 'black', '#27AE60', '#F4D03F');
+    formatter.addGradientRange(7, 15, 'black', '#F4D03F', '#E74C3C');
+    formatter.addRange(null, null, 'black', '#E74C3C');
     formatter.format(data, 2);
 
     let table = new google.visualization.Table(document.getElementById('lastaccess_plot'));
@@ -754,10 +758,21 @@ function draw_P_aggregated() {
     data.addColumn({ id: 'max', type: 'number', role: 'interval' });
 
     data.addColumn({ type: 'string', role: 'tooltip' })
+
     let data_p = [];
+    let codes = [];
+
     aggregate_Grades.forEach(element => {
-        let aux = [element.code + "", 100, element.min, element.Q1, element.median, element.Q3, element.max,
-        "Grades in " + element.name + ":\n\tMax: " + element.max + "\n\tQ3: " + element.Q3 + "\n\tMedian: " + element.median + "\n\tQ1: " + element.Q1 + "\n\tMin: " + element.min];
+
+        let min = Math.round(element.min * 10) / 10;
+        let q1 = Math.round(element.Q1 * 10) / 10;
+        let median = Math.round(element.median * 10) / 10;
+        let q3 = Math.round(element.Q3 * 10) / 10;
+        let max = Math.round(element.max * 10) / 10;
+
+        let aux = [element.code + "", 100, min, q1, median, q3, max,
+        "Grades in " + element.name + ":\n\tMax: " + max + "\n\tQ3: " + q3 + "\n\tMedian: " + median + "\n\tQ1: " + q1 + "\n\tMin: " + min];
+
         let index = aggregate_Acts.findIndex((e) => e.course == element.course);
         let v = aggregate_Acts[index];
         if (v == null) {
@@ -768,9 +783,17 @@ function draw_P_aggregated() {
             v.Q3 = null;
             v.max = null;
         }
+
+        let vmin = Math.round(v.min * 10) / 10;
+        let vq1 = Math.round(v.Q1 * 10) / 10;
+        let vmedian = Math.round(v.median * 10) / 10;
+        let vq3 = Math.round(v.Q3 * 10) / 10;
+        let vmax = Math.round(v.max * 10) / 10;
+        codes.push(element.code)
         aux = aux.concat([100, v.min, v.Q1, v.median, v.Q3, v.max,
-            "Participation in " + element.name + ":\n\tMax: " + v.max + "\n\tQ3: " + v.Q3 + "\n\tMedian: " + v.median + "\n\tQ1: " + v.Q1 + "\n\tMin: " + v.min
+            "Participation in " + element.name + ":\n\tMax: " + vmax + "\n\tQ3: " + vq3 + "\n\tMedian: " + vmedian + "\n\tQ1: " + vq1 + "\n\tMin: " + vmin
         ]);
+ 
         data_p.push(aux);
     });
     // Add data.
@@ -805,16 +828,37 @@ function draw_P_aggregated() {
         dataOpacity: 0
 
     };
+    
     let chart = new google.visualization.ColumnChart(document.getElementById('agg_plot'));
-
     chart.draw(data, options);
 
     d3.selectAll('#agg_plot').selectAll('g[clip-path] > g:nth-child(2)').raise();
     d3.selectAll('#agg_plot > div > div:nth-child(1) > div > svg > g:nth-child(5) > g:nth-child(4) > g text[text-anchor="middle"]').on('click', clickHandler).style('cursor', 'pointer');
+    d3.selectAll('#agg_plot > div > div:nth-child(1) > div > svg > g:nth-child(5) > g:nth-child(4) > g text[text-anchor="middle"]').on('mouseover', mouseOver).on('mouseout', mouseOut);
+
+    google.visualization.events.addListener(chart, 'onmouseover', changecursorPOINTER);
+    google.visualization.events.addListener(chart, 'onmouseout', changecursorDEFAULT);
+    google.visualization.events.addListener(chart, 'select', clickHandlerCode);
+  
 
     function clickHandler() {
         window.location.href = "/course?code=" + this.innerHTML;
     }
+    function mouseOver(event) {
+        d3.select(this).attr('fill', '#3366BB');
+        d3.select(this).style("text-decoration","underline");
+    }
+    function mouseOut(event) {
+        d3.select(this).attr('fill', 'black');
+        d3.select(this).style("text-decoration","none");
+    }
+
+    function clickHandlerCode() {
+        let selection = chart.getSelection()
+        let code = codes[selection[0].row];
+        window.location.href = "/course?code=" + code ;
+    }
+
 
 }
 function drawHistogram() {
@@ -919,7 +963,7 @@ function draw_weekly_percentage() {
 
         data_point.push(element.week);
         columns.forEach(elem => {
-            data_point.push(100 * element.courses[elem].done_activities / element.courses[elem].activities);
+            data_point.push(Math.round((100*element.courses[elem].done_activities / element.courses[elem].activities)*10)/10);
         });
         data_p.push(data_point);
     });
@@ -941,6 +985,7 @@ function draw_weekly_percentage() {
             position: 'top'
         },
     };
+    
     let chart = new google.visualization.LineChart(document.getElementById('weekly_percentage'));
     chart.draw(data, options);
 }

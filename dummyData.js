@@ -41,15 +41,15 @@ function createDummyData() {
     let good_students = shuffled.slice(number_of_not_participating + number_of_bad_students);
 
     let courses = [
-        { id: 22116, code: "PWEB", name: "Programação Web" },
+        { id: 22116, code: "PWeb", name: "Programação Web" },
         { id: 22119, code: "PRI", name: "Pesquisa e Recuperação de Informação" },
-        { id: 22120, code: "RVI", name: "Realidade Virtual Distribuída" },
-        { id: 22121, code: "SMA", name: "Sistemas Multiagente" },
+        { id: 22120, code: "RVD", name: "Realidade Virtual Distribuída" },
+        { id: 22121, code: "SMa", name: "Sistemas Multiagente" },
         { id: 22122, code: "IHC", name: "Interação Humano-Computador" },
         { id: 22124, code: "ECD", name: "Extração do Conhecimento de Dados" },
         { id: 22126, code: "VI", name: "Visualização de Informação" },
         { id: 22129, code: "DISS", name: "Dissertação" },
-        { id: 22130, code: "HEUM", name: "Heurísticas Modernas" }
+        { id: 22130, code: "HeuM", name: "Heurísticas Modernas" }
     ];
 
     const shuffled2 = students.sort(() => 0.5 - Math.random());
