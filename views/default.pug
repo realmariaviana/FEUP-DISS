@@ -1,3 +1,4 @@
+block variables
 doctype html
 html
   head
@@ -6,6 +7,7 @@ html
     script(src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous")
     script(src="https://d3js.org/d3.v5.min.js")
     link(rel='stylesheet' href='/css/style.css')
+    link(rel='stylesheet' href='/css/header.css')
     script(src="https://d3js.org/d3.v5.min.js")
   body
     main
@@ -13,8 +15,18 @@ html
         header
           h1 
             a(href="/") #{title}
+            nav
+              a(href='/students') Students
+              script.
+              ul
+                li Courses
+                  ul
+                    each course in allCourses
+                      li 
+                        a(href="/course?code="+ course.code) #{course.code}
+                      
             if histogram_data == null
               a(href="/")
-                button Back to Program View
+            //-     button Back to Program View
           //- a(href="/reload") Reload
       block content

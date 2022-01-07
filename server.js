@@ -13,8 +13,10 @@ app.set('view engine', 'pug');
 
 app.use(express.static(__dirname + '/public'));
 
+
 app.get('/', (req, res) => {
   let promises = [];
+
   promises.push(queries.get_activities_from_all_students());
   promises.push(queries.get_evaluations());
   promises.push(queries.get_lastAccess());
@@ -22,6 +24,8 @@ app.get('/', (req, res) => {
   promises.push(queries.get_activities_by_week_by_course());
   promises.push(queries.get_P_aggregate_activities());
   promises.push(queries.get_P_aggregate_grades());
+  promises.push(queries.get_all_c());
+
   Promise.all(promises).then((values) => {
     res.render('index', {
       title: TITLE,
@@ -31,7 +35,8 @@ app.get('/', (req, res) => {
       participation_by_course: values[3],
       weekly_percentage: values[4],
       aggregate_Acts: values[5],
-      aggregate_Grades: values[6]
+      aggregate_Grades: values[6],
+      all_courses: values[7]
     });
   });
 
@@ -50,6 +55,7 @@ app.get('/student', (req, res) => {
   promises.push(queries.get_indicators(student_id));
   promises.push(queries.get_timeline_of_activities_done(student_id));
   promises.push(queries.get_S_activities_in_timeline(student_id));
+  promises.push(queries.get_all_c());
   Promise.all(promises).then((values) => {
     if (values[0] == undefined) {
       res.status(404).render('student404', { title: TITLE });
@@ -63,7 +69,8 @@ app.get('/student', (req, res) => {
       weekly_activities: values[4],
       indicators: values[5],
       timeline_info: values[6],
-      proposed_act: values[7]
+      proposed_act: values[7],
+      all_courses: values[8]
     });
   });
 });
@@ -88,6 +95,8 @@ app.get('/course', async(req, res) => {
   promises.push(queries.get_C_evaluations_from_course(course_id));
   promises.push(queries.get_activities_by_week_by_course());
   promises.push(queries.get_C_boxplot_of_activities(course_id));
+  promises.push(queries.get_all_c());
+
   Promise.all(promises).then((values) => {
     if (values[0] == undefined) {
       res.status(404).render('course404', { title: TITLE });
@@ -100,9 +109,27 @@ app.get('/course', async(req, res) => {
       grades_info: values[3],
       week_info: values[4],
       box_plot_info: values[5],
+      all_courses: values[6]
     });
   });
 });
+
+app.get('/students', (req, res) => {
+  let promises = [];
+  promises.push(queries.get_activities_from_all_students());
+  promises.push(queries.get_lastAccess());
+  promises.push(queries.get_all_c());
+  Promise.all(promises).then((values) => {
+    res.render('students', {
+      title: TITLE,
+      histogram_data: values[0],
+      last_access: values[1],
+      all_courses: values[2]
+    });
+  });
+
+});
+
 app.get('/reload', (req, res) => {
   dbFunc.routeReload().then((v) => {
     // res.redirect('/');

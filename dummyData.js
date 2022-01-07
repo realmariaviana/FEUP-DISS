@@ -22,11 +22,37 @@ function createDummyData() {
 
     let surnames = ["Quinta", "Barrico", "Cruz", "Neto", "Varão", "Robalo", "Mendes", "Quintana", "Rosário", "Chousa", "Ferrão", "Caminha", "Cisneiros", "Ulhoa", "Gama", "Figueiredo", "Letras", "Carrasco", "Alencar", "Carvalhal", "Botelho", "Pêcego", "Vidigal", "Baptista", "Silvestre", "Tabanez", "Ventura", "Figueira", "Malheiro", "Zagalo", "Espinosa", "Goulão", "Vides", "Monforte", "Calado", "Prestes", "Cabeça de Vaca", "Lameiras", "Mourão", "Meireles", "Imperial", "Camargo", "Proença", "Fiães", "Moreira", "Sales", "Lousã", "Saraiva", "Café", "Ximenes", "Parreir", "Veiga", "Casado", "Mariz", "Marinho", "Carvalho", "Vidal", "Valente", "Belchior", "Filipe", "Mainha", "Matos", "França", "Garcez", "Craveiro", "Marçal", "Urias", "Barata", "Azambuja", "Borja", "Fitas", "Calçada"];
     let names = ["Ryan", "Raúl", "Eliel", "Hayla", "Aida", "Teresa", "Imran", "Rute", "Adelaide", "Mickael", "Flora", "Aylla", "Serena", "Nuna", "Sílvia", "Mercês", "Sol", "Bárbara", "Angélico", "Kendra", "Samanta", "Victória", "Anderson", "Alexandro", "Kailany", "Andressa", "Dulce", "Emilie", "Pavel", "Camila", "Telmo", "Constança", "Luisa", "Avelino", "Enrique", "Jordan"];
+    let editions = ["1ª", "2ª", "3ª", "4ª", "5ª", "6ª"];
+    let regimes = ["tempo parcial", "tempo integral"];
 
     let students = [];
+    
     for (let index = 0; index < number_of_students_in_a_semester; index++) {
         let name = names[Math.floor(Math.random() * names.length)] + " " + surnames[Math.floor(Math.random() * surnames.length)] + " " + surnames[Math.floor(Math.random() * surnames.length)];
-        let student = { id: index, name: name };
+        
+        let randomNrEdition = randomIntFromInterval(1, 12)
+        if(randomNrEdition < 2){
+            courseEdition = editions[0];
+        } else if(randomNrEdition > 2 && randomNrEdition < 4){
+            courseEdition = editions[1];
+        } else if(randomNrEdition > 4 && randomNrEdition < 6){
+            courseEdition = editions[2];
+        } else if(randomNrEdition > 6 && randomNrEdition < 8){
+            courseEdition = editions[3];
+        } else if(randomNrEdition > 8 && randomNrEdition < 10){
+            courseEdition = editions[4];
+        } else {
+            courseEdition = editions[5];
+        }
+        
+        let randomNrRegime = randomIntFromInterval(1, 10)
+        if(randomNrRegime < 8){
+            enrollmentRegime = regimes[0];
+        } else{
+            enrollmentRegime = regimes[1];
+        }
+
+        let student = { id: index, name: name, courseEdition: courseEdition, enrollmentRegime: enrollmentRegime};
         students.push(student);
     }
     let number_of_not_participating = number_of_students_in_a_semester * .1;
@@ -171,8 +197,8 @@ function createDummyData() {
 
     let promise = new Promise((resolve, reject) => {
         db.serialize(() => {
-            db.run("INSERT OR IGNORE INTO Student (id, name) VALUES " + students.map((x) => "(?,?)").join(',') + ";",
-                [].concat.apply([], students.map((x) => [x['id'], x['name']])))
+            db.run("INSERT OR IGNORE INTO Student (id, name, courseEdition, enrollmentRegime) VALUES " + students.map((x) => "(?,?,?,?)").join(',') + ";",
+                [].concat.apply([], students.map((x) => [x['id'], x['name'], x['courseEdition'], x['enrollmentRegime']])))
                 .run('INSERT INTO Course (id, name, code) VALUES ' + courses.map((x) => '(?,?,?)').join(',') + ';',
                     [].concat.apply([], courses.map((x) => [x['id'], x['name'], x['code']])))
                 .run('INSERT INTO Student_in_Course (student, course, lastaccess) VALUES ' + students_in_courses.map((x) => '(?,?,?)').join(',') + ';',
@@ -200,6 +226,11 @@ function createDummyData() {
     return promise;
 
 }
+
+function randomIntFromInterval(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) + min)
+}
+
 function Skedt_random() {
     let max = Math.random();
     for (let index = 0; index < 5; index++) {
@@ -210,6 +241,7 @@ function Skedt_random() {
     }
     return max;
 }
+
 function participate(student, topic, day, students_in_courses, activities) {
     let day_timestamp = Math.floor(Math.floor(beginDate.getTime() + day * 1000 * 60 * 60 * 24) / 1000);
     switch (topic.type) {

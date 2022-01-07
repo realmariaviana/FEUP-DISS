@@ -1,0 +1,21 @@
+extends default
+block variables         
+   - var allCourses = all_courses
+
+block content
+    script.
+        let histogram_data = !{JSON.stringify(histogram_data)};
+        let last_access = !{JSON.stringify(last_access)};
+
+        function drawALL() {
+            draw_P_LastDaysExtended();
+        }
+
+    div(class="content")
+        div(class="grid-container")
+            div(id="table")
+                        
+   
+    script(type="text/javascript" src="https://www.gstatic.com/charts/loader.js")
+    script(type="text/javascript" src="javascript/chartsGoogle.js")
+    link(rel='stylesheet' href='/css/modal.css')

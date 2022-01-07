@@ -71,9 +71,6 @@ function fetch_evaluations(courses) {
         fetch(url)
             .then(response => response.json())
             .then(data => {
-                console.log("----------EVALUATIONS--------------");
-                console.log(data);
-                console.log("-----------------------------------");
                 let res = parse_list_of_evaluations(data);
                 
                 load_evaluations_to_db(res);
@@ -88,9 +85,6 @@ function fetch_quizzes(students_all) {
     fetch(url)
         .then(response => response.json())
         .then(data => {
-            console.log("----------QUIZZES--------------");
-            console.log(data);
-            console.log("-----------------------------------");
             let quizzes = parse_list_of_quizzes(data);
             load_quizzes_to_db(quizzes);
             fetch_attempts(quizzes, students_all);
@@ -105,9 +99,6 @@ function fetch_assigns(students_all) {
         .then(response => response.json())
         .then(data => {
             let assigns = parse_list_of_assigns(data);
-            console.log("----------ASSIGNS--------------");
-            console.log(assigns);
-            console.log("-----------------------------------");
             load_assigns_to_db(assigns);
             fetch_submissions(assigns);
         });
@@ -119,9 +110,6 @@ function fetch_forums() {
     fetch(url)
         .then(response => response.json())
         .then(data => {
-            console.log("----------FORUNS--------------");
-            console.log(data);
-            console.log("-----------------------------------");
             let forums = parse_list_of_forums(data);
             load_forums_to_db(forums);
             fetch_discussions(forums)
@@ -216,8 +204,8 @@ function load_courses_to_db(courses) {
 }
 function load_students_to_db(students, course) {
     if (students.length > 0) {
-        let sql = 'INSERT OR IGNORE INTO Student (id, name) VALUES ' + students.map((x) => '(?,?)').join(',') + ';';
-        let params = [].concat.apply([], students.map((x) => [x['id'], x['name']]));
+        let sql = 'INSERT OR IGNORE INTO Student (id, name, courseEdition, enrollmentRegime) VALUES ' + students.map((x) => '(?,?,?,?)').join(',') + ';';
+        let params = [].concat.apply([], students.map((x) => [x['id'], x['name'], x['courseEdition'], x['enrollmentRegime']]));
         db.run(sql, params,
             function (err, result) {
                 if (err) {
@@ -456,7 +444,7 @@ function parse_list_of_courses(data) {
 function parse_list_of_students(data) {
     let students = [];
     data.forEach(element => {
-        let student = { 'id': element.id, 'name': element.fullname, 'lastaccess': element.lastcourseaccess == 0 ? null : element.lastcourseaccess };
+        let student = { 'id': element.id, 'name': element.fullname, 'courseEdition': element.courseEdition, 'enrollmentRegime': element.enrollmentRegime, 'lastaccess': element.lastcourseaccess == 0 ? null : element.lastcourseaccess };
         if (undefined != element['roles'].find(el => el['roleid'] == STUDENT_ROLE_ID)) {
             students.push(student);
         }

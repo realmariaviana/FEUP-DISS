@@ -13,6 +13,15 @@ function changecursorDEFAULT(e) {
     document.body.style.cursor = 'default';
 }
 
+function mouseOver(event) {
+    d3.select(this).attr('fill', '#3366BB');
+    d3.select(this).style("text-decoration","underline");
+}
+function mouseOut(event) {
+    d3.select(this).attr('fill', 'black');
+    d3.select(this).style("text-decoration","none");
+}
+
 function draw_C_participation_on_course() {
     let data = new google.visualization.DataTable();
 
@@ -59,7 +68,6 @@ function draw_C_participation_on_course() {
     chart.draw(data, options);
     
 }
-
  function draw_C_timeline_on_course() {
 
       var data = new google.visualization.DataTable();
@@ -113,11 +121,37 @@ function draw_C_participation_on_course() {
         height: height + 22*aux.length,
         width: width + 200,
         gantt: {
+            palette: [
+                {
+                  "color": "#ADC2EB",
+                  "dark": "#3366CC",
+                  "light": "white"
+                }
+              ],          
           trackHeight: 30
+        },
+        legend: {
+            position: 'top'
         }
       };
 
-      var chart = new google.visualization.Gantt(document.getElementById('timeline_on_course_plot'));
+        var container = document.getElementById('timeline_on_course_plot');
+        var chart = new google.visualization.Gantt(container);
+        var observer = new MutationObserver(function () {
+            $.each($('text'), function (index, label) {
+            var rowIndex = data.getFilteredRows([{
+                column: 1,
+                value: $(label).text()
+            }]);
+            if (rowIndex.length > 0) {
+                $(label).attr('fill', '#000000')
+            }
+            });
+        });
+        observer.observe(container, {
+            childList: true,
+            subtree: true
+        });
 
       chart.draw(data, options);
 }
@@ -176,7 +210,11 @@ function draw_C_evaluations() {
     grades_info.data.forEach(element => {
         let eval_row = [];
         eval_row.push(element.name);
-        eval_row = eval_row.concat(element.students_values);
+        grades = element.students_values
+        grades.forEach(function(part, index, grades) {
+            grades[index] = Math.round(grades[index] * 10) / 10;
+          });
+        eval_row = eval_row.concat(grades);
         eval_row.push(element.min, element.Q1, element.median, element.Q3, element.max);
         data_p.push(eval_row);
     });
@@ -224,8 +262,6 @@ function draw_C_evaluations() {
     let chart = new google.visualization.LineChart(document.getElementById('evaluations_plot'));
 
     chart.draw(data, options);
-   // google.visualization.events.addListener(chart, 'fff', () => {console.log("AAAAAAA");});
-
 }
 function draw_C_activities_dist() {
 
@@ -233,15 +269,40 @@ function draw_C_activities_dist() {
     data.addColumn('string', 'Type');
     for (let index = 0; index < box_plot_info.students_ids.length; index++) {
         let name = participation_info[participation_info.findIndex((x) => { return x[0] == grades_info.students_ids[index] })][1];
+        
         data.addColumn('number', name);
     }
+
     data.addColumn({ id: 'min', type: 'number', role: 'interval' });
     data.addColumn({ id: 'firstQuartile', type: 'number', role: 'interval' });
     data.addColumn({ id: 'median', type: 'number', role: 'interval' });
     data.addColumn({ id: 'thirdQuartile', type: 'number', role: 'interval' });
     data.addColumn({ id: 'max', type: 'number', role: 'interval' });
-    data.addRows(box_plot_info.data);
-    console.log(box_plot_info.data)
+
+    let foruns = box_plot_info.data[0];
+    let quizzes = box_plot_info.data[1];
+    let assigns = box_plot_info.data[2];
+
+    foruns.forEach(function(part, index, foruns){
+        if(typeof(foruns[index]) == 'number'){
+            foruns[index] = Math.round(foruns[index] * 10) / 10;
+        }
+    });
+
+    quizzes.forEach(function(part, index, quizzes){
+        if(typeof(quizzes[index]) == 'number'){
+            quizzes[index] = Math.round(quizzes[index] * 10) / 10;
+        }
+    });
+
+    assigns.forEach(function(part, index, assigns){
+        if(typeof(assigns[index]) == 'number'){
+            assigns[index] = Math.round(assigns[index] * 10) / 10;
+        }
+    });
+
+    data.addRows([foruns, quizzes, assigns]);
+
     let options = {
         title: "Distribution of participation in each activity type",
         vAxis: {
@@ -279,28 +340,32 @@ function draw_S_activities_in_timeline() {
     data.addColumn('string', 'Row');
     data.addColumn('string', 'Bar');
     data.addColumn({ type: 'string', role: 'tooltip' });
-
+    data.addColumn({ type: 'string', role: 'style' });
     data.addColumn('datetime', 'Start');
-    data.addColumn('datetime', 'End');
+    data.addColumn('datetime', 'End');   
 
     let aux = [];
     proposed_act.forEach(element => {
-        let tooltip = (element.done != null ? ('<p> Done on ' + new Date(element.done * 1000).toDateString()) : "<p> Not Done")+ '<br>' + new Date(element.time_open * 1000).toDateString() + ' to ' + new Date(element.time_close * 1000).toDateString() + '<br>Week ' + element.week_start + ' to ' + element.week_end + '</p>';
+        let tooltip = (element.done != null ? ('<p> ' + element.name + ' done on ' + new Date(element.done * 1000).toDateString()) : "<p>" + element.name + " not done")+ '<br>' + new Date(element.time_open * 1000).toDateString() + ' to ' + new Date(element.time_close * 1000).toDateString() + '<br>Week ' + element.week_start + ' to ' + element.week_end + '</p>';
         aux.push(
             [
                 element.code + '',
                 element.done != null ? (element.done > element.time_close ? "Late" : "Done") : "Missing",
                 tooltip,
+                element.done != null ? (element.done > element.time_close ? "#F4D03F" : "#27AE60") : "#E74C3C",
                 new Date(element.time_open * 1000),
                 new Date(element.time_close * 1000)
             ]
         );
     });
-    // Add data.
+
     data.addRows(aux);
+
     var options = {
         title: 'Activities timeline',
-        timeline: { showRowLabels: true },
+        timeline: { showRowLabels: true,
+                    groupByRowLabel: true
+        },
         allowHtml: true,
         height: height,
         width: width
@@ -308,6 +373,24 @@ function draw_S_activities_in_timeline() {
 
     let chart = new google.visualization.Timeline(document.getElementById('act_plot'));
 
+    var observer = new MutationObserver(setBorderColor);
+    google.visualization.events.addListener(chart, 'ready', function () {
+        setBorderColor();
+        observer.observe(document, {
+        childList: true,
+        subtree: true
+        });
+    });
+
+  function setBorderColor() {
+    Array.prototype.forEach.call(document.querySelectorAll('#act_plot > div > div > div > div:nth-child(2) > svg > g:nth-child(4) > rect'), function (rect) {
+        rect.setAttribute('stroke', "white");
+    });
+
+    Array.prototype.forEach.call(document.querySelectorAll('#act_plot > div > div:nth-child(1) > div > svg > g:nth-child(5) > rect'), function (rect) {
+        rect.setAttribute('stroke', "white");
+    });
+  }
     function clickHandler() {
         window.location.href = "/course?id=" + this.innerHTML;
     }
@@ -333,12 +416,12 @@ function draw_S_GradesTable() {
     });
     let data = new google.visualization.DataTable();
     data.addColumn('string', 'Course');
-    data.addColumn('string', 'Evaluation');
+    data.addColumn('string', 'Activity');
     data.addColumn('number', 'Grade');
     data.addColumn('number', 'Percentile');
     data.addRows(data_p);
 
-    let colors = ['#3366cc ', '#dc3912 ', '#ff9900 ', '#109618 ', '#990099 ', '#0099c6 ', '#dd4477 ', '#66aa00 ', '#b82e2e ', '#316395 ', '#994499 ', '#22aa99 ', '#aaaa11 ', '#6633cc ', '#e67300 ', '#8b0707 ', '#651067 ', '#329262 ', '#5574a6 ', '#3b3eac ', '#b77322 ', '#16d620 ', '#b91383 ', '#f4359e ', '#9c5935 ', '#a9c413 ', '#2a778d ', '#668d1c ', '#bea413 ', '#0c5922 ', '#743411'];
+    let colors = ['#ede0d4 ', '#e6ccb2 ', '#ddb892', '#D3A778', '#C78E52'];
     let color_id = -1;
     let course_name = "";
     for (let index = 0; index < data_p.length; index++) {
@@ -350,6 +433,7 @@ function draw_S_GradesTable() {
         data.setProperty(index, 1, 'style', 'background-color: ' + colors[color_id] + ';');
         data.setProperty(index, 2, 'style', 'background-color: ' + colors[color_id] + ';');
         data.setProperty(index, 3, 'style', 'background-color: ' + colors[color_id] + ';');
+        
     }
 
     let options = {
@@ -363,13 +447,13 @@ function draw_S_GradesTable() {
     }
 
     let formatter = new google.visualization.ColorFormat();
-    formatter.addGradientRange(0, .5, 'black', 'red', 'yellow');
-    formatter.addGradientRange(0.5, 1.01, 'black', 'yellow', 'green');
+    formatter.addGradientRange(0, .5, 'black', '#E74C3C', '#F4D03F');
+    formatter.addGradientRange(0.5, 1.01, 'black', '#F4D03F', '#27AE60');
     formatter.format(data, 3);
 
     let formatter1 = new google.visualization.ColorFormat();
-    formatter1.addGradientRange(0, 75, 'black', 'red', 'yellow');
-    formatter1.addGradientRange(75, 101, 'black', 'yellow', 'green');
+    formatter1.addGradientRange(0, 75, 'black', '#E74C3C', '#F4D03F');
+    formatter1.addGradientRange(75, 101, 'black', '#F4D03F', '#27AE60');
     formatter1.format(data, 2);
     let table = new google.visualization.Table(document.getElementById('grades_plot'));
 
@@ -416,7 +500,7 @@ function draw_S_Weekly() {
 }
 function draw_S_Percentages() {
     percentages_data.forEach(element => {
-        element[7] = student.name + " -> " + element[1].toFixed(2) + "%\n They are on the " + element[7].toFixed(2) + " percentile";
+        element[7] = student.name + " -> " + element[1].toFixed(2) + "%\n The student is on the " + element[7].toFixed(2) + " percentile";
     });
     let data = new google.visualization.DataTable();
 
@@ -436,7 +520,7 @@ function draw_S_Percentages() {
         vAxis: {
             title: 'Percentage'
         },
-        height: height,
+        height: height-25,
         width: width,
         tooltip: { isHtml: true },
         legend: { position: 'none' },
@@ -736,7 +820,7 @@ function draw_P_Grades() {
     // }
 
 }
-function draw_P_aggregated() {
+function draw_P_aggregated(value) {
 
     let data = new google.visualization.DataTable();
 
@@ -753,14 +837,23 @@ function draw_P_aggregated() {
     data.addColumn('number', 'Participation');
     data.addColumn({ id: 'min', type: 'number', role: 'interval' });
     data.addColumn({ id: 'firstQuartile', type: 'number', role: 'interval' });
-    data.addColumn({ id: 'median', type: 'number', role: 'interval' });
+    data.addColumn({ id: 'median', type : 'number', role: 'interval' });
     data.addColumn({ id: 'thirdQuartile', type: 'number', role: 'interval' });
     data.addColumn({ id: 'max', type: 'number', role: 'interval' });
 
-    data.addColumn({ type: 'string', role: 'tooltip' })
+    data.addColumn({ type: 'string', role: 'tooltip' });
+
+    data.addColumn('number', 'Reference value');
 
     let data_p = [];
     let codes = [];
+
+    let reference_value = parseInt(value);
+    if (reference_value == NaN){
+        reference_value = document.getElementById("response").value;
+    }
+    
+    data.addRows([[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,reference_value]]);
 
     aggregate_Grades.forEach(element => {
 
@@ -791,13 +884,14 @@ function draw_P_aggregated() {
         let vmax = Math.round(v.max * 10) / 10;
         codes.push(element.code)
         aux = aux.concat([100, v.min, v.Q1, v.median, v.Q3, v.max,
-            "Participation in " + element.name + ":\n\tMax: " + vmax + "\n\tQ3: " + vq3 + "\n\tMedian: " + vmedian + "\n\tQ1: " + vq1 + "\n\tMin: " + vmin
+            "Participation in " + element.name + ":\n\tMax: " + vmax + "\n\tQ3: " + vq3 + "\n\tMedian: " + vmedian + "\n\tQ1: " + vq1 + "\n\tMin: " + vmin, reference_value
         ]);
- 
         data_p.push(aux);
     });
     // Add data.
     data.addRows(data_p);
+    data.addRows([[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,reference_value]]);
+
     let options = {
         title: "Distribution of the students' grades and participation in each course",
         vAxis: {
@@ -809,7 +903,6 @@ function draw_P_aggregated() {
         height: height,
         width: width,
         legend: { position: 'top' },
-        tooltip: { isHtml: true },
         intervals: {
             barWidth: 1,
             boxWidth: 1,
@@ -824,13 +917,15 @@ function draw_P_aggregated() {
                 style: 'bars'
             }
         },
-
-        dataOpacity: 0
-
+        dataOpacity: 0,
+        seriesType: 'bars',
+        series: {
+            2: {type: 'line'}}
     };
     
-    let chart = new google.visualization.ColumnChart(document.getElementById('agg_plot'));
+    let chart = new google.visualization.ComboChart(document.getElementById('agg_plot'));
     chart.draw(data, options);
+
 
     d3.selectAll('#agg_plot').selectAll('g[clip-path] > g:nth-child(2)').raise();
     d3.selectAll('#agg_plot > div > div:nth-child(1) > div > svg > g:nth-child(5) > g:nth-child(4) > g text[text-anchor="middle"]').on('click', clickHandler).style('cursor', 'pointer');
@@ -839,23 +934,15 @@ function draw_P_aggregated() {
     google.visualization.events.addListener(chart, 'onmouseover', changecursorPOINTER);
     google.visualization.events.addListener(chart, 'onmouseout', changecursorDEFAULT);
     google.visualization.events.addListener(chart, 'select', clickHandlerCode);
-  
+
 
     function clickHandler() {
         window.location.href = "/course?code=" + this.innerHTML;
     }
-    function mouseOver(event) {
-        d3.select(this).attr('fill', '#3366BB');
-        d3.select(this).style("text-decoration","underline");
-    }
-    function mouseOut(event) {
-        d3.select(this).attr('fill', 'black');
-        d3.select(this).style("text-decoration","none");
-    }
 
     function clickHandlerCode() {
-        let selection = chart.getSelection()
-        let code = codes[selection[0].row];
+        let selection = chart.getSelection()[0]
+        let code = codes[selection.row];
         window.location.href = "/course?code=" + code ;
     }
 
@@ -866,30 +953,31 @@ function drawHistogram() {
 
     // Declare columns
 
-
     data.addColumn({ id: 'Student', type: 'string' });
     data.addColumn('number', 'Percentage of participation');
 
     let aux = [];
     histogram_data.forEach(element => {
-        aux.push([element[0], element[1]]);
+        aux.push([element[0], Math.round(element[1]*10)/10]);
+        
     });
     // Add data.
+ 
     data.addRows(aux);
     var options = {
         title: 'Distribution of the students by the percentage of participated activities',
-        legend: { position: 'none' },
         hAxis: {
             title: 'Percentage of participated activities',
             viewWindowMode: 'maximized',
-            viewWindow: { max: 100 }
+            viewWindow: { max: 100 },
         },
+        legend: { position: 'none' },
         allowHtml: true,
         height: height,
-        width: width,
+        width: width-20,
         vAxis: {
             title: 'Number of students'
-        }
+        },
     };
 
     let chart = new google.visualization.Histogram(document.getElementById('histogram'));
@@ -908,14 +996,47 @@ function drawHistogram() {
 
     chart.draw(data, options);
 }
+function drawPieChart() {
+    let data = new google.visualization.DataTable();
+
+    data.addColumn('string', 'Interval of percentages');
+    data.addColumn('number', 'Percentage of students in the interval');
+
+    let intervals = [[], [], [], [], [], [], [], [], [], []];
+    histogram_data.forEach(element => {
+        let interval = (Math.round(element[1]/10));
+        let i = 0;
+        if(!interval < 1){
+            i = interval -1;
+        }
+        intervals[i].push(1);
+       
+    });
+
+    for(let i = 0; i < intervals.length; i++){
+       let interval_string = "" + i*10 + "-" + (i+1)*10;
+        data.addRows([[interval_string,intervals[i].length]])
+    }
+
+    var options = {
+        title: 'Distribution of the students by the percentage of participated activities',
+        pieHole: 0.1,
+        width: width-20,
+        height: height
+    };
+
+    let chart = new google.visualization.PieChart(document.getElementById('histogram'));
+
+    chart.draw(data, options);
+}
 function drawTimelineDisplay() {
     let data_p = [];
     timeline_info.forEach(element => {
         data_p.push(
             [
                 element.week,
-                100 * element.student.done_activities / element.student.all_activities,
-                100 * element.average,
+                Math.round((100 * element.student.done_activities / element.student.all_activities)*10)/10,
+                Math.round((100 * element.average)*10)/10,
 
             ]
         );
@@ -939,6 +1060,7 @@ function drawTimelineDisplay() {
         hAxis: {
             title: 'Week of the semester'
         },
+        focusTarget: 'category',
         legend: {
             position: 'top'
         },
@@ -949,12 +1071,19 @@ function drawTimelineDisplay() {
 function draw_weekly_percentage() {
     let data_p = [];
     let data = new google.visualization.DataTable();
+
     // Declare columns
     data.addColumn('number', 'Week');
     let columns = [];
     weekly_percentage[0].courses.forEach(element => {
-        if (element != null) {
-            data.addColumn('number', element.code);
+        if (element != null) {            
+            data.addColumn({
+                type: 'number',
+                label: element.code,
+                color: 'red',
+                disabledColor: '#FFD9D9',
+                visible: true
+              });
             columns.push(element.course);
         }
     });
@@ -963,12 +1092,21 @@ function draw_weekly_percentage() {
 
         data_point.push(element.week);
         columns.forEach(elem => {
-            data_point.push(Math.round((100*element.courses[elem].done_activities / element.courses[elem].activities)*10)/10);
+            let value = Math.round((100*element.courses[elem].done_activities / element.courses[elem].activities)*10)/10;
+
+            if (value == "Nan"){
+                value == parseInt("N/A");
+            }
+
+            data_point.push(value);
         });
+        
         data_p.push(data_point);
     });
     // Add data.
     data.addRows(data_p);
+
+    
     let options = {
         title: "Percentage of activities done(posts, quizzes attempts and submissions) until week",
         vAxis: {
@@ -982,11 +1120,154 @@ function draw_weekly_percentage() {
         },
         focusTarget: 'category',
         legend: {
-            position: 'top'
+            position: 'right'
         },
     };
-    
+
     let chart = new google.visualization.LineChart(document.getElementById('weekly_percentage'));
+    let columnsToHide = [];
+    let dataValues = [];
+
+    for (let i= 0 ; i < data.getNumberOfRows(); i++){
+        dataValues[i] = [];
+        for (let j=0; j < data.getNumberOfColumns(); j++ ){
+            dataValues[i][j] = data.getValue(i,j);
+        }
+    }
+
+    function selectHandler() {
+        let selectedItem = chart.getSelection()[0].column;
+        if (selectedItem) {
+           if(columnsToHide.includes(selectedItem)){
+            let index = columnsToHide.indexOf(selectedItem);
+            if (index > -1) {
+                columnsToHide.splice(index, 1);
+            }
+                for (let j=0; j < data.getNumberOfRows() ; j++ ){
+                        data.setCell(j,selectedItem, dataValues[j][selectedItem]);
+                }
+           }
+           else {
+                columnsToHide.push(selectedItem);
+               
+                for (let j=0; j < data.getNumberOfRows() ; j++ ){
+                        data.setCell(j,selectedItem , 0/0);
+                }
+                
+
+           }
+           chart.draw(data, options);
+        }
+      }
+    
+    google.visualization.events.addListener(chart, 'select', selectHandler); 
+    google.visualization.events.addListener(chart, 'onmouseover', changecursorPOINTER);
+    google.visualization.events.addListener(chart, 'onmouseout', changecursorDEFAULT);
+  
+    //d3.selectAll('#weekly_percentage > div > div > div > svg > g:nth-child(4) > g text[text-anchor="start"]').on('click', selectHandler).style('cursor', 'pointer');
+    //d3.selectAll('#weekly_percentage > div > div > div > svg > g:nth-child(4) > g text[text-anchor="start"]').on('mouseover', mouseOver).on('mouseout', mouseOut);
     chart.draw(data, options);
+}
+function draw_P_LastDaysExtended() {
+    let data_p = [];
+    let data = new google.visualization.DataTable();
+    data.addColumn('number', 'ID');
+    data.addColumn('string', 'Student');
+    data.addColumn('number', 'Days since last access');
+    data.addColumn('number', 'Mean of the Percentage of open activities done');
+    data.addColumn('number', 'Percentage of open activities done');
+    data.addColumn('string', 'Course Edition');
+    data.addColumn('string', 'Enrollment Regime');
+
+    last_access.forEach(element => {
+        let average = Math.round(element.avg * 10) / 10;
+        let percentage = Math.round(element.per * 10) / 10;
+        let name = histogram_data[histogram_data.findIndex((x) => { return x[2] == element.id })][0];
+        let courseEdition = histogram_data[histogram_data.findIndex((x) => { return x[2] == element.id })][3];
+        let enrollmentEdition = histogram_data[histogram_data.findIndex((x) => { return x[2] == element.id })][4];
+        data_p.push([element.id, name, element.days, average, percentage, courseEdition, enrollmentEdition]);
+    });
+
+    data.addRows(data_p);
+    let options = {
+        alternatingRowStyle: false,
+        allowHtml: true,
+        sortColumn: 0,
+        cssClassNames: { headerCell: 'googleHeaderCell' },
+        width: '100%',
+        height: 500,
+        sort: 'event'
+    }
+
+    let formatter = new google.visualization.ColorFormat();
+    formatter.addGradientRange(0, 7, 'black', '#27AE60', '#F4D03F');
+    formatter.addGradientRange(7, 15, 'black', '#F4D03F', '#E74C3C');
+    formatter.addRange(null, null, 'black', '#E74C3C');
+    formatter.format(data, 2);
+
+    let table = new google.visualization.Table(document.getElementById('table'));
+
+    function selectHandler() {
+        var selectedItem = table.getSelection()[0];
+        if (selectedItem) {
+            var value = data.getValue(selectedItem.row, 0);
+            window.location.href = "/student?id=" + value;
+        }
+    }
+
+    function sortHandler(e) {
+        if (e.column == 0) {
+            var sortValues = [];
+            var sortRows = [];
+            var sortDirection = (e.ascending) ? 1 : -1;
+            for (var i = 0; i < data.getNumberOfRows(); i++) {
+                sortValues.push(
+                    data.getValue(i, e.column + 1)
+                );
+            }
+            sortValues.sort(
+                function (row1, row2) {
+                    return row1.localeCompare(row2) * sortDirection;
+                }
+            );
+
+            sortValues.forEach(function (sortValue) {
+                sortRows.push(data.getFilteredRows([{ column: e.column + 1, value: sortValue }])[0]);
+            });
+
+            let rows = [];
+            sortRows.forEach(element => {
+                let row = [];
+                for (let index = 0; index < data.getNumberOfColumns(); index++) {
+                    row.push(data.getValue(element, index));
+                }
+                rows.push(row);
+            });
+
+            data.removeRows(0, data.getNumberOfRows());
+            data.addRows(rows);
+            formatter.format(data, 2);
+            options.sortColumn = e.column;
+            options.sortAscending = e.ascending;
+            table.draw(view, options);
+
+        } else {
+            data.sort({ column: e.column + 1, desc: e.ascending });
+            options.sortColumn = e.column;
+            options.sortAscending = e.ascending;
+            table.draw(view, options);
+        }
+        d3.selectAll('#table').selectAll('table').style('cursor', 'pointer');
+    }
+
+    google.visualization.events.addListener(table, 'select', selectHandler);
+    google.visualization.events.addListener(table, 'sort', sortHandler);
+
+    let view = new google.visualization.DataView(data);
+
+    view.setColumns([1, 2, 3, 4, 5, 6]);
+    table.draw(view, options);
+
+    d3.selectAll('#table').selectAll('table').style('cursor', 'pointer');
 }
 

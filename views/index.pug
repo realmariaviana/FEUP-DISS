@@ -1,4 +1,6 @@
 extends default
+block variables         
+   - var allCourses = all_courses
 
 block content
     script.
@@ -9,20 +11,75 @@ block content
         let weekly_percentage = !{JSON.stringify(weekly_percentage)};
         let aggregate_Acts = !{JSON.stringify(aggregate_Acts)};
         let aggregate_Grades = !{JSON.stringify(aggregate_Grades)};
+        let click = false;
+        let reference = "70";
+
+        var something = function() {
+           draw_P_aggregated(response.value);
+           reference=response.value;
+        }
 
         function drawALL() {
             draw_weekly_percentage();
-            drawHistogram();
             draw_P_LastDays();
-            draw_P_aggregated();
+            draw_P_aggregated(reference);
+            draw_P_LastDaysExtended();
+            drawOption(); 
+        }
+
+        function drawOption(){
+            if(!click){
+                drawHistogram();
+            }
+            else{
+                drawPieChart();
+            }
+        }
+
+        function clicked(){
+            click = !click;   
+            drawOption();   
         }
 
     div(class="content")
         div(class="grid-container")
-            div(id="agg_plot")
+            div 
+                div(id="agg_plot")
+                form(id="refvalue" style='text-align:center')
+                    label(for='refvalue') Value of reference:
+                    input#response(type='number', name='fname', min="0", max="100", value="70")
+                    input(type='button', value='OK', onclick="something()")
+
             div(id="weekly_percentage")
+
+            button(id="myBtn1" class="open" onclick="clicked()") &#8635;
             div(id="histogram")
+
+            button(id="myBtn" class="open") &#8598;
+            div(id="myModal" class="modal")
+                div(id="modalContent" class="modal-content")
+                    span(class="close") &times;
+                    div(id="table")
+                        script.
+                            var modal = document.getElementById("myModal");
+                            var btn = document.getElementById("myBtn");
+                            var span = document.getElementsByClassName("close")[0];
+                                
+                            btn.onclick = function() {
+                                modal.style.display = "block";
+                            }
+
+                            span.onclick = function() {
+                                modal.style.display = "none";
+                            }
+
+                            window.onclick = function(event) {
+                                if (event.target == modal) {
+                                    modal.style.display = "none";
+                                }
+                            }
             div(id="lastaccess_plot")
    
     script(type="text/javascript" src="https://www.gstatic.com/charts/loader.js")
     script(type="text/javascript" src="javascript/chartsGoogle.js")
+    link(rel='stylesheet' href='/css/modal.css')

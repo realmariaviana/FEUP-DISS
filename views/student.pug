@@ -1,5 +1,7 @@
 extends default
-
+block variables         
+   - var allCourses = all_courses
+   
 block content
     script.
         let percentages_data = !{JSON.stringify(percentages_data)};
@@ -23,7 +25,12 @@ block content
         div(class="grid-container")
             div(id="act_plot")
             div(id="timeline_plot")
-            div(id="percentages_plot" style={'grid-row-start': 1, 'grid-column-start': 2})
+            div(id="plotplot")
+                div(id="percentages_plot" style={'grid-row-start': 1, 'grid-column-start': 2})
+                <ul id="legend">
+                    <li><span class="legend3"></span> Enrolled courses statistics</li>
+                    <li><span class="legend4"></span> #{student.name}</li>
+                </ul>
             div(id="grades_plot" style={'grid-row-start': 2, 'grid-column-start': 1})
 
     script(type="text/javascript" src="https://www.gstatic.com/charts/loader.js")

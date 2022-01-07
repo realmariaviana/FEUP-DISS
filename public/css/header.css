@@ -1,0 +1,102 @@
+
+    header{
+    padding: 1em;
+    font-size: 140%;
+    top: 100vh;
+    left: 0;
+    transition: opacity .2s ease-in-out;
+    text-align: left;
+    background-image: linear-gradient(#D8D8D8, white);
+    border-bottom: 1px solid black;
+  }
+
+  header h1 {
+    font-weight: 600;
+    display: inline;
+    margin: 0;
+    padding: 0;
+    font-size: inherit;
+   }
+
+  nav{
+    float: right;
+    margin-right: 5%;
+  } 
+
+  nav a {
+    display: inline-block;
+    outline: none;
+    text-decoration: none;
+    opacity: .7;
+    padding: 0 .5em;
+    color: black;
+    transition: opacity .2s ease-in-out;
+  } 
+
+  nav a:hover,
+  nav a:focus {
+    opacity: 1;
+  }  
+
+  ul {
+    text-align: left;
+    display: inline;
+    margin: 0;
+    padding: 15px 4px 17px 0;
+    list-style: none;  
+  }
+
+  ul li {
+    display: inline-block;
+    margin-right: -4px;
+    position: relative;
+    padding: 15px 20px;
+    cursor: pointer;
+    transition: opacity .2s ease-in-out;  
+  }
+
+  ul li:hover .overlay {
+    display: block;
+  }
+
+  ul li ul {
+    transition: opacity .2s ease-in-out;
+    padding: 0;
+    position: absolute;
+    top: 48px;
+    left: 0;
+    width: 150px;
+    box-shadow: none;
+    display: none;
+    opacity: 0;
+    visibility: hidden;
+    background-color: white; 
+  }
+
+  ul li ul li {
+    min-width: 80px;
+    z-index: 1;
+  }
+
+  ul li ul li > a { 
+    text-decoration: none;
+    display: block; 
+  }
+
+  ul li ul li:hover {
+    color: black;
+  }
+
+  ul li:hover ul {
+    display: block;
+    opacity: 1;
+    visibility: visible;
+  }
+
+   ul li > span {
+      display: inline-block;
+      margin: 0 0 -3px 5px;
+      width: 12px;
+      height: 12px;
+      background-size: 12px 12px;
+  }
