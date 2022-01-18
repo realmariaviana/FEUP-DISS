@@ -1,6 +1,5 @@
-
 .modal {
-    display: none; /* Hidden by default */
+    display: none;
     position: fixed; 
     z-index: 1; 
     padding-top: 50px; 
@@ -13,7 +12,6 @@
     background-color: rgba(0,0,0,0.4); 
   }
   
-  /* Modal Content */
   .modal-content {
     background-color: #fefefe;
     margin: auto;
@@ -21,11 +19,6 @@
     border: 1px solid #888;
     width: 80%;
     height: 80%;
-  }
-
-  .open{
-    width: 3%;
-    height: 4%;
   }
   
   .close {
@@ -42,6 +35,29 @@
     cursor: pointer;
   } 
 
-  #table{
-    margin-top: 3%;
+  #histogram{
+    margin-top: 4%;
   }
+  #myBtn1{
+    float: left;
+  }
+  #myBtn{
+    float: left;
+  }
+
+  #joinedHistogram{
+    padding-left: 50px;
+  }
+
+  #participation_on_course_plot{
+    margin-top: 4%;
+  }
+  #myBtn2{
+    float: left;
+  }
+  
+  #modalContent #table{
+    width: 100%;
+    height: 95%;
+    text-align: center;
+  } 

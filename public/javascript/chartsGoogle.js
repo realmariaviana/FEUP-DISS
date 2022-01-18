@@ -1,5 +1,13 @@
-const height = 275;
-const width = 550;
+let height;
+let width;
+
+if($(window).width() >= 2500){
+    height = $(window).height()/4;
+    width = $(window).width()/3;
+} else {
+    height = 275;
+    width = 550;
+}
 
 // Load the Visualization API and the corechart package.
 google.charts.load('current', { 'packages': ['corechart', 'table', 'timeline', 'gantt'] });
@@ -48,7 +56,8 @@ function draw_C_participation_on_course() {
         width: width,
         vAxis: {
             title: 'Number of students'
-        }
+        },
+        backgroundColor: '#f4f4f4'
     };
 
     let chart = new google.visualization.Histogram(document.getElementById('participation_on_course_plot'));
@@ -68,6 +77,36 @@ function draw_C_participation_on_course() {
     chart.draw(data, options);
     
 }
+function drawPieChartCourse() {
+    let data = new google.visualization.DataTable();
+
+    data.addColumn('string', 'Interval of percentages');
+    data.addColumn('number', 'Percentage of students in the interval');
+
+    let intervals = [[], [], [], [], [], [], [], [], [], []];
+    participation_info.forEach(element => {
+        let interval = (Math.trunc(element[2]/10));
+        intervals[interval].push(element[2]);
+       
+    });
+
+    for(let i = 0; i < intervals.length; i++){
+       let interval_string = "" + i*10 + "-" + (i+1)*10;
+        data.addRows([[interval_string,intervals[i].length]])
+    }
+
+    var options = {
+        title: 'Distribution of the students by the percentage of participated activities',
+        pieHole: 0.1,
+        width: width-20,
+        height: height,
+        backgroundColor: '#f4f4f4'
+    };
+
+    let chart = new google.visualization.PieChart(document.getElementById('participation_on_course_plot'));
+
+    chart.draw(data, options);
+}
  function draw_C_timeline_on_course() {
 
       var data = new google.visualization.DataTable();
@@ -79,6 +118,7 @@ function draw_C_participation_on_course() {
       data.addColumn('number', 'Duration in days');
       data.addColumn('number', 'Percent Complete');
       data.addColumn('string', 'Dependencies');
+
 
     let aux = [];
     timeline_info.forEach(element => {
@@ -115,11 +155,15 @@ function draw_C_participation_on_course() {
         );
     });  
     data.addRows(aux);
-      
+    let trackHeight = 30;
+
       var options = {
         title: "Timeline of the course",
-        height: height + 22*aux.length,
+        height: data.getNumberOfRows() * trackHeight + 45,
         width: width + 200,
+        hAxis: {
+            format: 'yyyy-MM-dd',
+          },
         gantt: {
             palette: [
                 {
@@ -128,11 +172,10 @@ function draw_C_participation_on_course() {
                   "light": "white"
                 }
               ],          
-          trackHeight: 30
+            trackHeight: trackHeight,
+          criticalPathEnabled:false,
         },
-        legend: {
-            position: 'top'
-        }
+        backgroundColor: '#f4f4f4'
       };
 
         var container = document.getElementById('timeline_on_course_plot');
@@ -201,6 +244,7 @@ function draw_C_weekly_percentage() {
         legend: {
             position: 'top'
         },
+        backgroundColor: '#f4f4f4'
     };
     let chart = new google.visualization.LineChart(document.getElementById('weekly_plot'));
     chart.draw(data, options);
@@ -258,6 +302,7 @@ function draw_C_evaluations() {
                 style: 'bars'
             }
         },
+        backgroundColor: '#f4f4f4'
     };
     let chart = new google.visualization.LineChart(document.getElementById('evaluations_plot'));
 
@@ -329,6 +374,7 @@ function draw_C_activities_dist() {
                 style: 'bars'
             }
         },
+        backgroundColor: '#f4f4f4'
     };
     let chart = new google.visualization.LineChart(document.getElementById('type_plot'));
     chart.draw(data, options);
@@ -368,7 +414,8 @@ function draw_S_activities_in_timeline() {
         },
         allowHtml: true,
         height: height,
-        width: width
+        width: width,
+        backgroundColor: '#f4f4f4'
     };
 
     let chart = new google.visualization.Timeline(document.getElementById('act_plot'));
@@ -409,7 +456,7 @@ function draw_S_GradesTable() {
             }
             course.evals.forEach(element => {
                 if (element != null) {
-                    data_p.push([course.course, element.name, element.grade, Number(element.percentile.toFixed(2))]);
+                    data_p.push([course.course, element.name, Math.round(element.grade * 10) / 10, Number(element.percentile.toFixed(2))]);
                 }
             });
         }
@@ -438,12 +485,13 @@ function draw_S_GradesTable() {
 
     let options = {
         title: "Grades",
-        height: height,
-        width: width,
+        width: $(window).width()/2.5,
+        height: $(window).height()/3,
         alternatingRowStyle: false,
         allowHtml: true,
         sortColumn: 0,
-        cssClassNames: { headerCell: 'googleHeaderCell' }
+        cssClassNames: { headerCell: 'googleHeaderCell' },
+        backgroundColor: '#f4f4f4'
     }
 
     let formatter = new google.visualization.ColorFormat();
@@ -493,7 +541,8 @@ function draw_S_Weekly() {
         },
         legend: {
             position: 'top'
-        }
+        },
+        backgroundColor: '#f4f4f4'
     };
     let chart = new google.visualization.LineChart(document.getElementById('week_plot'));
     chart.draw(data, options);
@@ -544,7 +593,8 @@ function draw_S_Percentages() {
                 style: 'bars',
                 fillOpacity: 1,
             }
-        }
+        },
+        backgroundColor: '#f4f4f4'
     };
     let chart = new google.visualization.LineChart(document.getElementById('percentages_plot'));
     chart.draw(data, options);
@@ -621,7 +671,8 @@ function draw_P_CoursesDisplay() {
                 style: 'bars',
                 fillOpacity: 1,
             }
-        }
+        },
+        backgroundColor: '#f4f4f4'
     };
     let chart = new google.visualization.ColumnChart(document.getElementById('courses_plot'));
     // The select handler. Call the chart's getSelection() method
@@ -663,7 +714,8 @@ function draw_P_LastDays() {
         width: width,
         sortColumn: 0,
         cssClassNames: { headerCell: 'googleHeaderCell' },
-        sort: 'event'
+        sort: 'event',
+        backgroundColor: '#f4f4f4'
     }
 
     let formatter = new google.visualization.ColorFormat();
@@ -804,9 +856,8 @@ function draw_P_Grades() {
                 style: 'bars'
             }
         },
-
-        dataOpacity: 0
-
+        dataOpacity: 0,
+        backgroundColor: '#f4f4f4'
     };
     let chart = new google.visualization.ColumnChart(document.getElementById('box_plot'));
 
@@ -900,6 +951,7 @@ function draw_P_aggregated(value) {
         hAxis: {
             title: 'Course',
         },
+        tooltip: { isHtml: true },
         height: height,
         width: width,
         legend: { position: 'top' },
@@ -920,7 +972,8 @@ function draw_P_aggregated(value) {
         dataOpacity: 0,
         seriesType: 'bars',
         series: {
-            2: {type: 'line'}}
+            2: {type: 'line'}},
+        backgroundColor: '#f4f4f4'
     };
     
     let chart = new google.visualization.ComboChart(document.getElementById('agg_plot'));
@@ -978,6 +1031,7 @@ function drawHistogram() {
         vAxis: {
             title: 'Number of students'
         },
+        backgroundColor: '#f4f4f4'
     };
 
     let chart = new google.visualization.Histogram(document.getElementById('histogram'));
@@ -1004,12 +1058,9 @@ function drawPieChart() {
 
     let intervals = [[], [], [], [], [], [], [], [], [], []];
     histogram_data.forEach(element => {
-        let interval = (Math.round(element[1]/10));
-        let i = 0;
-        if(!interval < 1){
-            i = interval -1;
-        }
-        intervals[i].push(1);
+        let interval = (Math.trunc(element[1]/10));
+    
+        intervals[interval].push(element[1]);
        
     });
 
@@ -1022,7 +1073,8 @@ function drawPieChart() {
         title: 'Distribution of the students by the percentage of participated activities',
         pieHole: 0.1,
         width: width-20,
-        height: height
+        height: height,
+        backgroundColor: '#f4f4f4'
     };
 
     let chart = new google.visualization.PieChart(document.getElementById('histogram'));
@@ -1064,6 +1116,7 @@ function drawTimelineDisplay() {
         legend: {
             position: 'top'
         },
+        backgroundColor: '#f4f4f4'
     };
     let chart = new google.visualization.LineChart(document.getElementById('timeline_plot'));
     chart.draw(data, options);
@@ -1122,6 +1175,7 @@ function draw_weekly_percentage() {
         legend: {
             position: 'right'
         },
+        backgroundColor: '#f4f4f4'
     };
 
     let chart = new google.visualization.LineChart(document.getElementById('weekly_percentage'));
@@ -1194,9 +1248,10 @@ function draw_P_LastDaysExtended() {
         allowHtml: true,
         sortColumn: 0,
         cssClassNames: { headerCell: 'googleHeaderCell' },
-        width: '100%',
-        height: 500,
-        sort: 'event'
+        width: $(window).width()/3.1,
+        height: $(window).height(),
+        sort: 'event',
+        backgroundColor: '#f4f4f4'
     }
 
     let formatter = new google.visualization.ColorFormat();

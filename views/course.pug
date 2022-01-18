@@ -10,35 +10,58 @@ block content
         let grades_info = !{JSON.stringify(grades_info)};
         let week_info = !{JSON.stringify(week_info)};
         let box_plot_info = !{JSON.stringify(box_plot_info)};
+        let click = false;
 
         function drawALL() {
             
             draw_C_activities_dist();
             draw_C_weekly_percentage();
-            draw_C_participation_on_course();
+            //draw_C_participation_on_course();
             draw_C_timeline_on_course();
             draw_C_evaluations();
+            drawOption(); 
+        }
+
+        function drawOption(){
+            if(!click){
+                draw_C_participation_on_course();
+            }
+            else{
+                drawPieChartCourse();
+            }
+        }
+
+        function clicked(){
+            click = !click;   
+            drawOption();   
         }
     
     div(class="content")
         p Course: #{course.name}
         div(class="grid-container")
             div(id="weekly_plot")
-            div(id="participation_on_course_plot")
+
+            div(id="joinedHistogramCourse")
+                button(id="myBtn2" class="open" onclick="clicked()") Alternate Graph
+                div(id="participation_on_course_plot")
+            
             div(id="type_plot")
             div(id="evaluations_plot")
             div(id="timeline")
                 h5 Course timeline
-                <ul id="legend">
-                    <li><span class="legend1"></span> Percentage of students who completed the task</li>
-                    <li><span class="legend2"></span> Percentage of students who did not complete the task</li>
-                </ul>
-                <p>
+                ul#legend
+                    li
+                        span.legend1
+                        |  Percentage of students who completed the task
+                    li
+                        span.legend2
+                        |  Percentage of students who did not complete the task
                 div(id="timeline_on_course_plot")
             
  
     script(type="text/javascript" src="https://www.gstatic.com/charts/loader.js")
     script(type="text/javascript" src="javascript/chartsGoogle.js")
     link(rel='stylesheet' href='/css/style.css')
+    link(rel='stylesheet' href='/css/modal.css')
         
 

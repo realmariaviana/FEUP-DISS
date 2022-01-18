@@ -13,18 +13,18 @@ html
     main
       block header
         header
-          h1 
-            a(href="/") #{title}
-            nav
-              a(href='/students') Students
-              script.
-              ul
-                li Courses
-                  ul
-                    each course in allCourses
-                      li 
-                        a(href="/course?code="+ course.code) #{course.code}
-                      
+          a(id="image", href='/')
+            img(src='../images/mtsiw.png', alt='Trulli', width='157.5', height='70')
+            //- a(href="/") #{title}
+          nav
+            a(href='/students', id="students") Students
+            ul
+              li(id="courses") Courses
+                ul
+                  each course in allCourses
+                    li 
+                      a(href="/course?code="+ course.code) #{course.code}
+
             if histogram_data == null
               a(href="/")
             //-     button Back to Program View

@@ -1,102 +1,94 @@
+header{
+  font-size: 140%;
+  left: 0;
+  transition: opacity .2s ease-in-out;
+  text-align: left;
+  background-color: white;
+}
+  
+#image{
+  vertical-align:middle;
+}
 
-    header{
-    padding: 1em;
-    font-size: 140%;
-    top: 100vh;
-    left: 0;
-    transition: opacity .2s ease-in-out;
-    text-align: left;
-    background-image: linear-gradient(#D8D8D8, white);
-    border-bottom: 1px solid black;
-  }
+nav{
+  display: inline;
+}
 
-  header h1 {
-    font-weight: 600;
-    display: inline;
-    margin: 0;
-    padding: 0;
-    font-size: inherit;
-   }
+nav ul li{
+  display: inline;
+  opacity: .7;
+}
 
-  nav{
-    float: right;
-    margin-right: 5%;
-  } 
+nav ul li:hover,
+nav ul li:focus {
+  opacity: 1;
+  cursor: pointer;
+} 
 
-  nav a {
-    display: inline-block;
-    outline: none;
-    text-decoration: none;
-    opacity: .7;
-    padding: 0 .5em;
-    color: black;
-    transition: opacity .2s ease-in-out;
-  } 
+nav a {
+  text-decoration: none;
+  opacity: .7;
+  padding: .5em .7em;
+  color: black;
+}
 
-  nav a:hover,
-  nav a:focus {
-    opacity: 1;
-  }  
+nav a:hover,
+nav a:focus {
+  opacity: 1;
+} 
 
-  ul {
-    text-align: left;
-    display: inline;
-    margin: 0;
-    padding: 15px 4px 17px 0;
-    list-style: none;  
-  }
+#courses{
+  display: inline-block;
+  position: relative;
+}
+ul {
+  text-align: left;
+  display: inline;
+  list-style: none; 
+  color: black;
+  transition: opacity .2s ease-in-out; 
+}
+ul li:hover .overlay {
+  display: block;
+}
 
-  ul li {
-    display: inline-block;
-    margin-right: -4px;
-    position: relative;
-    padding: 15px 20px;
-    cursor: pointer;
-    transition: opacity .2s ease-in-out;  
-  }
 
-  ul li:hover .overlay {
-    display: block;
-  }
+ul li ul {
+  transition: opacity .2s ease-in-out;
+  padding: 0;
+  position: absolute;
+  top: 25px;
+  left: 0;
+  width: 130px;
+  box-shadow: none;
+  opacity: 0;
+  visibility: hidden;
+  background-color: white; 
+  box-shadow: 0px 3px 5px -1px #ccc;
+  font-size: large;
+}
 
-  ul li ul {
-    transition: opacity .2s ease-in-out;
-    padding: 0;
-    position: absolute;
-    top: 48px;
-    left: 0;
-    width: 150px;
-    box-shadow: none;
-    display: none;
-    opacity: 0;
-    visibility: hidden;
-    background-color: white; 
-  }
+ul li ul li {
+  min-width: 80px;
+  z-index: 1;
+}
 
-  ul li ul li {
-    min-width: 80px;
-    z-index: 1;
-  }
+ul li ul li a { 
+  text-decoration: none;
+  display: block; 
+  padding: 10px;
+  border-left: 2px solid #8f969b;
+  transition: right 2s ease;
+}
 
-  ul li ul li > a { 
-    text-decoration: none;
-    display: block; 
-  }
+ul li:hover ul {
+  opacity: 1;
+  visibility: visible;
+  z-index: 1;
+} 
 
-  ul li ul li:hover {
-    color: black;
-  }
+ul li ul li:hover {
+  color: black;
+  position: relative;
+}
 
-  ul li:hover ul {
-    display: block;
-    opacity: 1;
-    visibility: visible;
-  }
-
-   ul li > span {
-      display: inline-block;
-      margin: 0 0 -3px 5px;
-      width: 12px;
-      height: 12px;
-      background-size: 12px 12px;
-  }

@@ -52,33 +52,35 @@ block content
 
             div(id="weekly_percentage")
 
-            button(id="myBtn1" class="open" onclick="clicked()") &#8635;
-            div(id="histogram")
+            div(id="joinedHistogram")
+                button(id="myBtn1" class="open" onclick="clicked()") Alternate graph
+                div(id="histogram")
 
-            button(id="myBtn" class="open") &#8598;
-            div(id="myModal" class="modal")
-                div(id="modalContent" class="modal-content")
-                    span(class="close") &times;
-                    div(id="table")
-                        script.
-                            var modal = document.getElementById("myModal");
-                            var btn = document.getElementById("myBtn");
-                            var span = document.getElementsByClassName("close")[0];
-                                
-                            btn.onclick = function() {
-                                modal.style.display = "block";
-                            }
+            div
+                button(id="myBtn" class="open") &#8598;
+                div(id="myModal" class="modal")
+                    div(id="modalContent" class="modal-content")
+                        span(class="close") &times;
+                        div(id="table")
+                            script.
+                                var modal = document.getElementById("myModal");
+                                var btn = document.getElementById("myBtn");
+                                var span = document.getElementsByClassName("close")[0];
+                                    
+                                btn.onclick = function() {
+                                    modal.style.display = "block";
+                                }
 
-                            span.onclick = function() {
-                                modal.style.display = "none";
-                            }
-
-                            window.onclick = function(event) {
-                                if (event.target == modal) {
+                                span.onclick = function() {
                                     modal.style.display = "none";
                                 }
-                            }
-            div(id="lastaccess_plot")
+
+                                window.onclick = function(event) {
+                                    if (event.target == modal) {
+                                        modal.style.display = "none";
+                                    }
+                                }
+                div(id="lastaccess_plot")
    
     script(type="text/javascript" src="https://www.gstatic.com/charts/loader.js")
     script(type="text/javascript" src="javascript/chartsGoogle.js")

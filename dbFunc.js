@@ -190,6 +190,7 @@ function fetch_attempts(quizzes, students_all) {
     return space_out_requestes(params, quizzes, index, students_all);
 }
 function load_courses_to_db(courses) {
+    console.log(courses);
     let sql = 'INSERT INTO Course (id, name, code) VALUES ' + courses.map((x) => '(?,?,?)').join(',') + ';';
     let params = [].concat.apply([], courses.map((x) => [x['id'], x['name'], x.code]));
     db.run(sql, params,

@@ -22,15 +22,23 @@ block content
         }
     div(class="content")
         p Student: #{student.name}
+        | Enrollment Regime: #{student.enrollmentRegime}
+        p
         div(class="grid-container")
-            div(id="act_plot")
+            div(id="actTimeline")
+                h5(style='margin-top:0%') Activities timeline
+                div(id="act_plot")
             div(id="timeline_plot")
             div(id="plotplot")
                 div(id="percentages_plot" style={'grid-row-start': 1, 'grid-column-start': 2})
-                <ul id="legend">
-                    <li><span class="legend3"></span> Enrolled courses statistics</li>
-                    <li><span class="legend4"></span> #{student.name}</li>
-                </ul>
+                ul#legend
+                    li
+                        span.legend3
+                        | Course statistics the student is enrolled in
+                    li
+                        span.legend4
+                        |  #{student.name}
+
             div(id="grades_plot" style={'grid-row-start': 2, 'grid-column-start': 1})
 
     script(type="text/javascript" src="https://www.gstatic.com/charts/loader.js")
