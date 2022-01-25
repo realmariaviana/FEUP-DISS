@@ -57,7 +57,8 @@ function draw_C_participation_on_course() {
         vAxis: {
             title: 'Number of students'
         },
-        backgroundColor: '#f4f4f4'
+        backgroundColor: '#f4f4f4',
+        histogram: { bucketSize: 10 }
     };
 
     let chart = new google.visualization.Histogram(document.getElementById('participation_on_course_plot'));
@@ -456,7 +457,7 @@ function draw_S_GradesTable() {
             }
             course.evals.forEach(element => {
                 if (element != null) {
-                    data_p.push([course.course, element.name, Math.round(element.grade * 10) / 10, Number(element.percentile.toFixed(2))]);
+                    data_p.push([course.course, element.name, Math.round(element.grade * 10) / 10, Math.round(element.percentile*10)/10]);
                 }
             });
         }
@@ -1031,7 +1032,8 @@ function drawHistogram() {
         vAxis: {
             title: 'Number of students'
         },
-        backgroundColor: '#f4f4f4'
+        backgroundColor: '#f4f4f4',
+        histogram: { bucketSize: 10 }
     };
 
     let chart = new google.visualization.Histogram(document.getElementById('histogram'));
@@ -1146,11 +1148,6 @@ function draw_weekly_percentage() {
         data_point.push(element.week);
         columns.forEach(elem => {
             let value = Math.round((100*element.courses[elem].done_activities / element.courses[elem].activities)*10)/10;
-
-            if (value == "Nan"){
-                value == parseInt("N/A");
-            }
-
             data_point.push(value);
         });
         

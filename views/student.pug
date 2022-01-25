@@ -21,8 +21,8 @@ block content
             draw_S_GradesTable();
         }
     div(class="content")
-        p Student: #{student.name}
-        | Enrollment Regime: #{student.enrollmentRegime}
+        h2(style={'text-align': 'center'}) #{student.name}
+        h5(style={'text-align': 'center', 'margin': 0}) Enrollment Regime: #{student.enrollmentRegime}
         p
         div(class="grid-container")
             div(id="actTimeline")
