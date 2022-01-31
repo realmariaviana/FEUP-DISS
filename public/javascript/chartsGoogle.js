@@ -996,7 +996,7 @@ function draw_P_aggregated(value) {
 
     function clickHandlerCode() {
         let selection = chart.getSelection()[0]
-        let code = codes[selection.row];
+        let code = codes[selection.row-1];
         window.location.href = "/course?code=" + code ;
     }
 
