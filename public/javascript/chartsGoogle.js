@@ -101,7 +101,19 @@ function drawPieChartCourse() {
         pieHole: 0.1,
         width: width-20,
         height: height,
-        backgroundColor: '#f4f4f4'
+        backgroundColor: '#f4f4f4',
+        slices: {
+            0: {color: '#E74C3C'}, 
+            1: {color: '#e76a3c'}, 
+            2: {color: '#e7893c'}, 
+            3: {color: '#e7a33c'}, 
+            4: {color: '#e7bf3c'},
+            5: {color: '#F4D03F'},
+            6: {color: '#d7ca50'},
+            7: {color: '#bfc947'},
+            8: {color: '#9cbf55'},
+            9: {color: '#27AE60'}
+        }
     };
 
     let chart = new google.visualization.PieChart(document.getElementById('participation_on_course_plot'));
@@ -205,7 +217,7 @@ function draw_C_weekly_percentage() {
     // Declare columns
     data.addColumn('number', 'Week');
     data.addColumn('number', course.name);
-    data.addColumn('number', 'Average Course');
+    data.addColumn('number', 'Average Program');
 
     let columns = [];
     week_info[0].courses.forEach(element => {
@@ -1076,7 +1088,19 @@ function drawPieChart() {
         pieHole: 0.1,
         width: width-20,
         height: height,
-        backgroundColor: '#f4f4f4'
+        backgroundColor: '#f4f4f4',
+        slices: {
+            0: {color: '#E74C3C'}, 
+            1: {color: '#e76a3c'}, 
+            2: {color: '#e7893c'}, 
+            3: {color: '#e7a33c'}, 
+            4: {color: '#e7bf3c'},
+            5: {color: '#F4D03F'},
+            6: {color: '#d7ca50'},
+            7: {color: '#bfc947'},
+            8: {color: '#9cbf55'},
+            9: {color: '#27AE60'}
+        }
     };
 
     let chart = new google.visualization.PieChart(document.getElementById('histogram'));
