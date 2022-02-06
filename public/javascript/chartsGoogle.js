@@ -217,7 +217,7 @@ function draw_C_weekly_percentage() {
     // Declare columns
     data.addColumn('number', 'Week');
     data.addColumn('number', course.name);
-    data.addColumn('number', 'Average Program');
+    data.addColumn('number', 'Program Average');
 
     let columns = [];
     week_info[0].courses.forEach(element => {
